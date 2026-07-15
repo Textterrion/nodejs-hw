@@ -8,42 +8,25 @@ import pinoHttp from 'pino-http';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const dummyNotes = [
-  { id: '1', title: 'Перша замітка', content: 'Ознайомитися з Express.js' },
-  { id: '2', title: 'Друга замітка', content: 'Налаштувати деплой на Render' },
-];
-
 app.use(pinoHttp());
 app.use(cors());
 app.use(express.json());
 
 app.get('/notes', (req, res) => {
   res.status(200).json({
-    message: 'Список заміток успішно отримано',
-    notes: dummyNotes,
+    message: 'Retrieved all notes',
   });
 });
 
 app.get('/notes/:noteId', (req, res) => {
   const { noteId } = req.params;
-  const note = dummyNotes.find((item) => item.id === noteId);
-
-  if (!note) {
-    return res.status(404).json({
-      message: 'Замітку не знайдено',
-    });
-  }
-
   res.status(200).json({
-    message: 'Замітку успішно знайдено',
-    note: note,
+    message: `Retrieved note with ID: ${noteId}`,
   });
 });
 
-app.get('/test-error', (req, res, next) => {
-  const err = new Error('Тестова помилка сервера!');
-  err.status = 500;
-  next(err);
+app.get('/test-error', () => {
+  throw new Error('Simulated server error');
 });
 
 app.use((req, res, next) => {
@@ -55,10 +38,10 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   const statusCode = err.status || 500;
 
-  req.log.error(err);
-
   res.status(statusCode).json({
     message: err.message || 'Internal server error',
+    status: 'fail',
+    code: statusCode,
   });
 });
 
