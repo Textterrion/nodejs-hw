@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Maliuk-Olexandr/nodejs-hw.git"
+    "url": "git+https://github.com/Textterrion/nodejs-hw.git"
   },
   "keywords": [],
-  "author": "Maliuk-Olexandr <maamcd100@gmail.com>",
+  "author": "Terrie",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Maliuk-Olexandr/nodejs-hw/issues"
+    "url": "https://github.com/Textterrion/nodejs-hw/issues"
   },
-  "homepage": "https://github.com/Maliuk-Olexandr/nodejs-hw#readme",
+  "homepage": "https://github.com/Textterrion/nodejs-hw#readme",
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "eslint": "^9.36.0",
@@ -30,6 +30,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "pino": "^10.3.1",
     "pino-http": "^11.0.0",
     "pino-pretty": "^13.1.3"
   }
