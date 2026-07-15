@@ -14,15 +14,13 @@ const dummyNotes = [
 ];
 
 app.use(pinoHttp());
-
 app.use(cors());
-
 app.use(express.json());
 
 app.get('/notes', (req, res) => {
   res.status(200).json({
-    status: 'success',
-    data: dummyNotes,
+    message: 'Список заміток успішно отримано',
+    notes: dummyNotes,
   });
 });
 
@@ -32,14 +30,13 @@ app.get('/notes/:noteId', (req, res) => {
 
   if (!note) {
     return res.status(404).json({
-      status: 'fail',
-      message: `Замітку з ID ${noteId} не знайдено`,
+      message: 'Замітку не знайдено',
     });
   }
 
   res.status(200).json({
-    status: 'success',
-    data: note,
+    message: 'Замітку успішно знайдено',
+    note: note,
   });
 });
 
@@ -51,8 +48,7 @@ app.get('/test-error', (req, res, next) => {
 
 app.use((req, res, next) => {
   res.status(404).json({
-    status: 'fail',
-    message: 'Ресурс не знайдено (404)',
+    message: 'Route not found',
   });
 });
 
@@ -62,8 +58,7 @@ app.use((err, req, res, next) => {
   req.log.error(err);
 
   res.status(statusCode).json({
-    status: 'error',
-    message: err.message || 'Внутрішня помилка сервера',
+    message: err.message || 'Internal server error',
   });
 });
 
