@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import Note from '../models/note.js';
+import { Note } from '../models/note.js';
 
 export const getAllNotes = async (req, res) => {
   const page = Number(req.query.page) || 1;
@@ -12,16 +12,13 @@ export const getAllNotes = async (req, res) => {
   if (tag) {
     filter.tag = tag;
   }
-  if (search && search.trim() !== '') {
-    filter.$text = { $search: search };
-  }
 
-  // if (search && search.trim() !== '') {
-  //   filter.$or = [
-  //     { title: { $regex: search, $options: 'i' } },
-  //     { content: { $regex: search, $options: 'i' } },
-  //   ];
-  // }
+  if (search && search.trim() !== '') {
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+    ];
+  }
 
   const [notes, totalNotes] = await Promise.all([
     Note.find(filter).skip(skip).limit(perPage).exec(),
@@ -66,9 +63,11 @@ export const deleteNote = async (req, res, next) => {
 
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
+
   const note = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
-    new: true,
+    returnDocument: 'after',
   });
+
   if (!note) {
     next(createHttpError(404, 'Note not found'));
     return;
