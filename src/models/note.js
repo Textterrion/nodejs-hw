@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose';
-import { TAGS } from '../constants/tags.js';
+import { Schema, model } from "mongoose";
+import { TAGS } from "../constants/tags.js";
 
 const noteSchema = new Schema(
   {
@@ -15,6 +15,6 @@ const noteSchema = new Schema(
   { timestamps: true },
 );
 
-noteSchema.index({ tag: 1 });
+noteSchema.index({ title: 'text', content: 'text', tag: 1 });
 
-export const Note = model('Note', noteSchema);
+export const Note = model("Note", noteSchema);
