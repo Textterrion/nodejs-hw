@@ -13,18 +13,17 @@ export const getAllNotes = async (req, res) => {
     filter.tag = tag;
   }
   if (search && search.trim() !== '') {
-    filter.$text = { $search: search };
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+    ];
   }
 
-  // if (search && search.trim() !== '') {
-  //   filter.$or = [
-  //     { title: { $regex: search, $options: 'i' } },
-  //     { content: { $regex: search, $options: 'i' } },
-  //   ];
-  // }
-
   const [notes, totalNotes] = await Promise.all([
-    Note.find({ userId: req.user._id, ...filter }).skip(skip).limit(perPage).exec(),
+    Note.find({ userId: req.user._id, ...filter })
+      .skip(skip)
+      .limit(perPage)
+      .exec(),
     Note.countDocuments({ userId: req.user._id, ...filter }),
   ]);
 
@@ -55,7 +54,10 @@ export const createNote = async (req, res) => {
 
 export const deleteNote = async (req, res, next) => {
   const { noteId } = req.params;
-  const note = await Note.findOneAndDelete({ _id: noteId, userId: req.user._id });
+  const note = await Note.findOneAndDelete({
+    _id: noteId,
+    userId: req.user._id,
+  });
   if (!note) {
     next(createHttpError(404, 'Note not found'));
     return;
@@ -65,9 +67,13 @@ export const deleteNote = async (req, res, next) => {
 
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
-  const note = await Note.findOneAndUpdate({ _id: noteId, userId: req.user._id }, req.body, {
-    new: true,
-  });
+  const note = await Note.findOneAndUpdate(
+    { _id: noteId, userId: req.user._id },
+    req.body,
+    {
+      returnDocument: 'after',
+    },
+  );
   if (!note) {
     next(createHttpError(404, 'Note not found'));
     return;
