@@ -53,30 +53,37 @@ export const logoutUser = async (req, res) => {
   res.status(204).send();
 };
 
-// Refresh user session
+// Refresh user session (Ваша виправлена версія ✅)
 export const refreshUserSession = async (req, res, next) => {
-  const session = await Session.findOne({
-    _id: req.cookies.sessionId,
-    refreshToken: req.cookies.refreshToken,
-  });
+  const { sessionId, refreshToken } = req.cookies;
+
+  const session = await Session.findOne({ _id: sessionId, refreshToken });
+
   if (!session) {
     return next(createHttpError(401, 'Session not found'));
   }
+
   const isSessionTokenExpired =
     new Date() > new Date(session.refreshTokenValidUntil);
+
   if (isSessionTokenExpired) {
+    await Session.deleteOne({ _id: sessionId, refreshToken });
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('sessionId');
+
     return next(createHttpError(401, 'Session token expired'));
   }
-  await Session.deleteOne({
-    _id: session._id,
-    refreshToken: req.cookies.refreshToken,
-  });
+
+  await Session.deleteOne({ _id: session._id, refreshToken });
   const newSession = await createSession(session.userId);
   setSessionCookies(res, newSession);
+
   res.status(200).json({ message: 'Session refreshed' });
 };
 
-// Request password reset email
+// Request password reset email (Повернуто з попередньої версії)
 export const requestResetEmail = async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -109,10 +116,6 @@ export const requestResetEmail = async (req, res, next) => {
       html,
     });
   } catch {
-
-    // catch (error) {
-    // console.error('Email sending error:', error);
-
     next(
       createHttpError(500, 'Failed to send the email, please try again later.'),
     );
